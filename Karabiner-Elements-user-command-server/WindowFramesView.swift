@@ -53,7 +53,7 @@ struct WindowFramesView: View {
 #Preview {
   let sample: [(bundleID: String, frame: CGRect)] = [
     ("com.example.One", CGRect(x: 10, y: 20, width: 300, height: 200)),
-    ("com.example.Two", CGRect(x: 40, y: 60, width: 640, height: 480))
+    ("com.example.Two", CGRect(x: 40, y: 60, width: 640, height: 480)),
   ]
   return WindowFramesView(entries: sample)
 }

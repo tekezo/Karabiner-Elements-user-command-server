@@ -63,20 +63,17 @@ enum WindowManager {
     var value: AnyObject?
     let result: AXError = AXUIElementCopyAttributeValue(
       appElem, kAXWindowsAttribute as CFString, &value)
-    guard result == AXError.success, let windows = value as? [AXUIElement],
-      let window = windows.first
-    else {
+    guard result == AXError.success, let windows = value as? [AXUIElement] else {
       print("WindowManager: no accessible windows for:", spec.bundleIdentifier)
       return
     }
 
-    // Compute target origin
+    // Compute target origin (shared for all windows)
     var originX: CGFloat
     switch spec.x {
     case .number(let x):
       originX = x
     case .center:
-      // Center on main screen horizontally
       let screen = NSScreen.main
       let screenFrame = screen?.visibleFrame ?? NSScreen.screens.first?.visibleFrame ?? .zero
       originX = screenFrame.midX - (spec.width / 2.0)
@@ -86,9 +83,42 @@ enum WindowManager {
     let size = CGSize(width: spec.width, height: spec.height)
     let position = CGPoint(x: originX, y: originY)
 
-    // macOS uses a bottom-left origin for AX frames in global coordinates
-    setAXSize(window: window, size: size)
-    setAXPosition(window: window, position: position)
+    for window in windows {
+      // Skip hidden or minimized windows
+      var hiddenRef: CFTypeRef?
+      if AXUIElementCopyAttributeValue(window, kAXHiddenAttribute as CFString, &hiddenRef) == .success,
+         let hidden = hiddenRef as? Bool, hidden {
+        continue
+      }
+      var miniRef: CFTypeRef?
+      if AXUIElementCopyAttributeValue(window, kAXMinimizedAttribute as CFString, &miniRef) == .success,
+         let minimized = miniRef as? Bool, minimized {
+        continue
+      }
+
+      // Skip desktop elements by role
+      var roleRef: CFTypeRef?
+      if AXUIElementCopyAttributeValue(window, kAXRoleAttribute as CFString, &roleRef) == .success,
+         let role = roleRef as? String, role == "AXDesktop" {
+        continue
+      }
+
+      // Skip zero-sized windows
+      var sizeRef: CFTypeRef?
+      _ = AXUIElementCopyAttributeValue(window, kAXSizeAttribute as CFString, &sizeRef)
+      var currentSize: CGSize = .zero
+      if let s = sizeRef, CFGetTypeID(s) == AXValueGetTypeID() {
+        let axValue: AXValue = unsafeDowncast(s, to: AXValue.self)
+        if AXValueGetType(axValue) == .cgSize {
+          AXValueGetValue(axValue, .cgSize, &currentSize)
+        }
+      }
+      if currentSize.width <= 0 || currentSize.height <= 0 { continue }
+
+      // Apply size and position
+      _ = setAXSize(window: window, size: size)
+      _ = setAXPosition(window: window, position: position)
+    }
   }
 
   @MainActor @discardableResult
