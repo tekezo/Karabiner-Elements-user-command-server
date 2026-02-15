@@ -1,0 +1,15 @@
+{
+  "originHash" : "b42247a00b153ab312de89a669d2ad28ce7caff0da2ca58f4802a846fd61c427",
+  "pins" : [
+    {
+      "identity" : "karabiner-elements-user-command-receiver",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pqrs-org/Karabiner-Elements-user-command-receiver",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a20d05e266d69c739970b9ae9b789be9794d0c92"
+      }
+    }
+  ],
+  "version" : 3
+}
