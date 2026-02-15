@@ -86,20 +86,25 @@ enum WindowManager {
     for window in windows {
       // Skip hidden or minimized windows
       var hiddenRef: CFTypeRef?
-      if AXUIElementCopyAttributeValue(window, kAXHiddenAttribute as CFString, &hiddenRef) == .success,
-         let hidden = hiddenRef as? Bool, hidden {
+      if AXUIElementCopyAttributeValue(window, kAXHiddenAttribute as CFString, &hiddenRef)
+        == .success,
+        let hidden = hiddenRef as? Bool, hidden
+      {
         continue
       }
       var miniRef: CFTypeRef?
-      if AXUIElementCopyAttributeValue(window, kAXMinimizedAttribute as CFString, &miniRef) == .success,
-         let minimized = miniRef as? Bool, minimized {
+      if AXUIElementCopyAttributeValue(window, kAXMinimizedAttribute as CFString, &miniRef)
+        == .success,
+        let minimized = miniRef as? Bool, minimized
+      {
         continue
       }
 
       // Skip desktop elements by role
       var roleRef: CFTypeRef?
       if AXUIElementCopyAttributeValue(window, kAXRoleAttribute as CFString, &roleRef) == .success,
-         let role = roleRef as? String, role == "AXDesktop" {
+        let role = roleRef as? String, role == "AXDesktop"
+      {
         continue
       }
 
