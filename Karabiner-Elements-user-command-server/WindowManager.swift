@@ -75,7 +75,7 @@ enum WindowManager {
       originX = x
     case .center:
       let screen = NSScreen.main
-      let screenFrame = screen?.visibleFrame ?? NSScreen.screens.first?.visibleFrame ?? .zero
+      let screenFrame = screen?.frame ?? NSScreen.screens.first?.frame ?? .zero
       originX = screenFrame.midX - (spec.width / 2.0)
     }
     let originY = spec.y
