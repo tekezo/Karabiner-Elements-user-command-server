@@ -53,8 +53,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       onJSON: { json in
         // Expecting a dictionary-like payload
         guard let dict = json as? [String: Any] else { return }
-
-        print("JSON:", dict)
         CommandHandler.handle(dict: dict)
       },
       onError: { error in
