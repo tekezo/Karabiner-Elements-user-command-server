@@ -1,3 +1,4 @@
+import AppKit
 import Combine
 import SwiftUI
 
@@ -45,19 +46,22 @@ struct WindowFramesView: View {
     VStack(alignment: .leading, spacing: 12) {
       Text("set_window_frames payload example")
         .font(.headline)
+        .padding()
 
       ScrollView {
         Text(payloadText)
           .font(.system(.body, design: .monospaced))
           .textSelection(.enabled)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(8)
-          .background(.thinMaterial)
-          .clipShape(RoundedRectangle(cornerRadius: 8))
+          .padding()
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background(Color(nsColor: .textBackgroundColor))
+      .overlay(
+        RoundedRectangle(cornerRadius: 6)
+          .stroke(Color(nsColor: .separatorColor), lineWidth: 1)
+      )
     }
-    .padding()
-    .frame(minWidth: 600, minHeight: 400)
+    .frame(minWidth: 600, minHeight: 200)
   }
 }
 

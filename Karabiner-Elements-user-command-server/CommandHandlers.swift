@@ -49,12 +49,13 @@ struct CommandHandler {
       if framesWindow == nil {
         let window = NSWindow(
           contentViewController: NSHostingController(rootView: WindowFramesView()))
-        window.setContentSize(NSSize(width: 900, height: 400))
-        window.contentMinSize = NSSize(width: 600, height: 200)
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.title = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "App"
         window.identifier = NSUserInterfaceItemIdentifier("WindowFrames")
         window.level = .floating
+        window.setContentSize(NSSize(width: 900, height: 400))
+        window.minSize = NSSize(width: 600, height: 200)
+        window.center()
         window.makeKeyAndOrderFront(nil)
 
         framesWindow = window
