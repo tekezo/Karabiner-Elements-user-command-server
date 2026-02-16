@@ -1,7 +1,15 @@
+import Combine
 import SwiftUI
 
+@MainActor
+final class WindowFramesStore: ObservableObject {
+  static let shared = WindowFramesStore()
+
+  @Published var entries: [(bundleID: String, frame: CGRect)] = []
+}
+
 struct WindowFramesView: View {
-  let entries: [(bundleID: String, frame: CGRect)]
+  @ObservedObject private var store = WindowFramesStore.shared
 
   private var payloadText: String {
     var lines: [String] = []
@@ -9,7 +17,7 @@ struct WindowFramesView: View {
     lines.append("[")
     var seen: Set<String> = []
     var payloadItems: [String] = []
-    for entry in entries {
+    for entry in store.entries {
       if entry.bundleID == "com.apple.controlcenter" {
         continue
       }
@@ -58,5 +66,6 @@ struct WindowFramesView: View {
     ("com.example.One", CGRect(x: 10, y: 20, width: 300, height: 200)),
     ("com.example.Two", CGRect(x: 40, y: 60, width: 640, height: 480)),
   ]
-  return WindowFramesView(entries: sample)
+  WindowFramesStore.shared.entries = sample
+  return WindowFramesView()
 }

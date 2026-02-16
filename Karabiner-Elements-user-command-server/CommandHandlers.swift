@@ -31,54 +31,44 @@ struct CommandHandler {
 
   nonisolated private static func handleShowWindowFrames() {
     Task { @MainActor in
-      // Open and pin our window to front
       NSApp.activate(ignoringOtherApps: true)
 
+      //
+      // Update WindowFramesStore.shared.entries
+      //
+
       let ownBundleID = Bundle.main.bundleIdentifier
-      let entries = WindowEnumerator.enumerateOtherAppWindows(excluding: ownBundleID)
-      let view = WindowFramesView(entries: entries)
 
-      let window: NSWindow
-      if let existing = framesWindow {
-        window = existing
+      WindowFramesStore.shared.entries =
+        WindowEnumerator.enumerateOtherAppWindows(excluding: ownBundleID)
 
-        // Replace view
-        if let hosting = window.contentViewController as? NSHostingController<WindowFramesView> {
-          hosting.rootView = view
-        } else {
-          let savedFrame = window.frame
-          let hosting = NSHostingController(rootView: view)
-          window.contentViewController = hosting
-          window.setFrame(savedFrame, display: false)
-        }
-      } else {
-        // Create new window
-        let hosting = NSHostingController(rootView: view)
-        let newWindow = NSWindow(contentViewController: hosting)
-        newWindow.setContentSize(NSSize(width: 900, height: 400))
-        newWindow.contentMinSize = NSSize(width: 600, height: 200)
-        newWindow.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        newWindow.title =
-          Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "App"
-        newWindow.identifier = NSUserInterfaceItemIdentifier("WindowFrames")
+      //
+      // Create new window if needed
+      //
 
-        framesWindow = newWindow
+      if framesWindow == nil {
+        let window = NSWindow(
+          contentViewController: NSHostingController(rootView: WindowFramesView()))
+        window.setContentSize(NSSize(width: 900, height: 400))
+        window.contentMinSize = NSSize(width: 600, height: 200)
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.title = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "App"
+        window.identifier = NSUserInterfaceItemIdentifier("WindowFrames")
+        window.level = .floating
+        window.makeKeyAndOrderFront(nil)
+
+        framesWindow = window
 
         NotificationCenter.default.addObserver(
           forName: NSWindow.willCloseNotification,
-          object: newWindow,
+          object: window,
           queue: .main
         ) { _ in
           Task { @MainActor in
             framesWindow = nil
           }
         }
-
-        window = newWindow
       }
-
-      window.makeKeyAndOrderFront(nil)
-      window.level = .floating
     }
   }
 }
