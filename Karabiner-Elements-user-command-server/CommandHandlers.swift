@@ -34,18 +34,36 @@ struct CommandHandler {
       // Open and pin our window to front
       NSApp.activate(ignoringOtherApps: true)
 
+      let ownBundleID = Bundle.main.bundleIdentifier
+      let entries = WindowEnumerator.enumerateOtherAppWindows(excluding: ownBundleID)
+      let view = WindowFramesView(entries: entries)
+
       let window: NSWindow
       if let existing = framesWindow {
         window = existing
+
+        // Replace view
+        if let hosting = window.contentViewController as? NSHostingController<WindowFramesView> {
+          hosting.rootView = view
+        } else {
+          let savedFrame = window.frame
+          let hosting = NSHostingController(rootView: view)
+          window.contentViewController = hosting
+          window.setFrame(savedFrame, display: false)
+        }
       } else {
-        let hosting = NSHostingController(rootView: ContentView())
+        // Create new window
+        let hosting = NSHostingController(rootView: view)
         let newWindow = NSWindow(contentViewController: hosting)
         newWindow.setContentSize(NSSize(width: 900, height: 400))
+        newWindow.contentMinSize = NSSize(width: 600, height: 200)
         newWindow.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         newWindow.title =
           Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "App"
         newWindow.identifier = NSUserInterfaceItemIdentifier("WindowFrames")
+
         framesWindow = newWindow
+
         NotificationCenter.default.addObserver(
           forName: NSWindow.willCloseNotification,
           object: newWindow,
@@ -55,30 +73,12 @@ struct CommandHandler {
             framesWindow = nil
           }
         }
+
         window = newWindow
       }
 
-      window.setContentSize(NSSize(width: 900, height: 400))
-      window.contentMinSize = NSSize(width: 900, height: 400)
-      window.styleMask.insert(.resizable)
-
-      // Make the window key and floating (always on top)
       window.makeKeyAndOrderFront(nil)
       window.level = .floating
-
-      let ownBundleID = Bundle.main.bundleIdentifier
-      let entries = WindowEnumerator.enumerateOtherAppWindows(excluding: ownBundleID)
-
-      let view = WindowFramesView(entries: entries)
-      if let hosting = window.contentViewController as? NSHostingController<WindowFramesView> {
-        hosting.rootView = view
-      } else {
-        let hosting = NSHostingController(rootView: view)
-        window.contentViewController = hosting
-      }
-
-      // Ensure visible and front
-      window.makeKeyAndOrderFront(nil)
     }
   }
 }

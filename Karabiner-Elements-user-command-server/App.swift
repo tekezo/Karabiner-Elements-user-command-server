@@ -41,14 +41,6 @@ struct UserCommandServerApp: App {
         )
       }
     )
-
-    // Define the main window scene, but don't auto-present it at launch
-    WindowGroup {
-      ContentView()
-    }
-    .defaultSize(width: 480, height: 320)
-    .windowStyle(.titleBar)
-    .windowResizability(.contentSize)
   }
 }
 
