@@ -6,6 +6,9 @@ import SwiftUI
 struct UserCommandServerApp: App {
   @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
+  private let version =
+    Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+
   private var appDisplayName: String {
     if let name = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String,
       !name.isEmpty
@@ -22,7 +25,7 @@ struct UserCommandServerApp: App {
   var body: some Scene {
     MenuBarExtra(
       content: {
-        Text(appDisplayName)
+        Text("\(appDisplayName) \(version)")
 
         Divider()
 
