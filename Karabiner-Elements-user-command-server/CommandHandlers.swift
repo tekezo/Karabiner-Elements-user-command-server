@@ -3,6 +3,8 @@ import Foundation
 import SwiftUI
 
 struct CommandHandler {
+  @MainActor private static var framesWindow: NSWindow?
+
   nonisolated static func handle(dict: [String: Any]) {
     let command = dict["command"] as? String
     if command == "set_window_frames" {
@@ -32,26 +34,29 @@ struct CommandHandler {
       // Open and pin our window to front
       NSApp.activate(ignoringOtherApps: true)
 
-      // Try to bring existing WindowGroup window to front, otherwise create one
-      var targetWindow: NSWindow?
-      for window in NSApp.windows {
-        if let id = window.identifier, id.rawValue.contains("WindowGroup") {
-          targetWindow = window
-          break
-        }
-      }
-
-      if targetWindow == nil {
+      let window: NSWindow
+      if let existing = framesWindow {
+        window = existing
+      } else {
         let hosting = NSHostingController(rootView: ContentView())
         let newWindow = NSWindow(contentViewController: hosting)
         newWindow.setContentSize(NSSize(width: 900, height: 400))
         newWindow.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         newWindow.title =
           Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "App"
-        targetWindow = newWindow
+        newWindow.identifier = NSUserInterfaceItemIdentifier("WindowFrames")
+        framesWindow = newWindow
+        NotificationCenter.default.addObserver(
+          forName: NSWindow.willCloseNotification,
+          object: newWindow,
+          queue: .main
+        ) { _ in
+          Task { @MainActor in
+            framesWindow = nil
+          }
+        }
+        window = newWindow
       }
-
-      guard let window = targetWindow else { return }
 
       window.setContentSize(NSSize(width: 900, height: 400))
       window.contentMinSize = NSSize(width: 900, height: 400)
