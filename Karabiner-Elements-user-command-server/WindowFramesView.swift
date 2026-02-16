@@ -35,7 +35,7 @@ struct WindowFramesView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
-      Text("set_window_frame payload example")
+      Text("set_window_frames payload example")
         .font(.headline)
 
       ScrollView {
@@ -46,15 +46,6 @@ struct WindowFramesView: View {
           .padding(8)
           .background(.thinMaterial)
           .clipShape(RoundedRectangle(cornerRadius: 8))
-      }
-
-      HStack {
-        Spacer()
-        Button("Copy Payload") {
-          let pb = NSPasteboard.general
-          pb.clearContents()
-          pb.setString(payloadText, forType: .string)
-        }
       }
     }
     .padding()
