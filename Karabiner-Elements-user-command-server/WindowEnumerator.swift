@@ -6,6 +6,7 @@ enum WindowEnumerator {
     bundleID: String, frame: CGRect
   )] {
     var results: [(bundleID: String, frame: CGRect)] = []
+    var bundleIDByPID: [pid_t: String?] = [:]
 
     let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
     guard
@@ -21,10 +22,14 @@ enum WindowEnumerator {
         let pid = info[kCGWindowOwnerPID as String] as? pid_t
       else { continue }
 
-      // Resolve bundle identifier from PID
-      var bid: String?
-      if let app = NSRunningApplication(processIdentifier: pid) {
-        bid = app.bundleIdentifier
+      // Resolve bundle identifier from PID only once per process.
+      let bid: String?
+      if let cached = bundleIDByPID[pid] {
+        bid = cached
+      } else {
+        let resolved = NSRunningApplication(processIdentifier: pid)?.bundleIdentifier
+        bundleIDByPID[pid] = resolved
+        bid = resolved
       }
 
       guard let bundle = bid, bundle != bundleID else { continue }
