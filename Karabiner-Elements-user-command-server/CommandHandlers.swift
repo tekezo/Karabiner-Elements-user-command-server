@@ -4,6 +4,7 @@ import SwiftUI
 
 struct CommandHandler {
   @MainActor private static var framesWindow: NSWindow?
+  @MainActor private static var framesWindowCloseObserver: NSObjectProtocol?
 
   nonisolated static func handle(dict: [String: Any]) {
     let command = dict["command"] as? String
@@ -59,13 +60,18 @@ struct CommandHandler {
 
         framesWindow = window
 
-        NotificationCenter.default.addObserver(
+        framesWindowCloseObserver = NotificationCenter.default.addObserver(
           forName: NSWindow.willCloseNotification,
           object: window,
           queue: .main
         ) { _ in
           Task { @MainActor in
             framesWindow = nil
+
+            if let observer = framesWindowCloseObserver {
+              NotificationCenter.default.removeObserver(observer)
+              framesWindowCloseObserver = nil
+            }
           }
         }
       }
