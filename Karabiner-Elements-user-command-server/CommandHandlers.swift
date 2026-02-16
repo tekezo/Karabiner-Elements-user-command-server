@@ -54,7 +54,6 @@ struct CommandHandler {
         window.identifier = NSUserInterfaceItemIdentifier("WindowFrames")
         window.level = .floating
         window.setContentSize(NSSize(width: 900, height: 400))
-        window.minSize = NSSize(width: 600, height: 200)
         window.center()
         window.makeKeyAndOrderFront(nil)
 

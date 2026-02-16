@@ -14,7 +14,6 @@ struct WindowFramesView: View {
 
   private var payloadText: String {
     var lines: [String] = []
-    lines.append("# set_window_frames payload example:")
     lines.append("[")
     var seen: Set<String> = []
     var payloadItems: [String] = []
@@ -43,7 +42,7 @@ struct WindowFramesView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: 6) {
       Text("set_window_frames payload example")
         .font(.headline)
         .padding()
