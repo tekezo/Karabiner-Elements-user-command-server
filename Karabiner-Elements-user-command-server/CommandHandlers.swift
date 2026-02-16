@@ -44,7 +44,7 @@ struct CommandHandler {
       if targetWindow == nil {
         let hosting = NSHostingController(rootView: ContentView())
         let newWindow = NSWindow(contentViewController: hosting)
-        newWindow.setContentSize(NSSize(width: 640, height: 480))
+        newWindow.setContentSize(NSSize(width: 900, height: 400))
         newWindow.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         newWindow.title =
           Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "App"
@@ -53,8 +53,8 @@ struct CommandHandler {
 
       guard let window = targetWindow else { return }
 
-      window.setContentSize(NSSize(width: 600, height: 400))
-      window.contentMinSize = NSSize(width: 600, height: 400)
+      window.setContentSize(NSSize(width: 900, height: 400))
+      window.contentMinSize = NSSize(width: 900, height: 400)
       window.styleMask.insert(.resizable)
 
       // Make the window key and floating (always on top)

@@ -5,17 +5,29 @@ struct WindowFramesView: View {
 
   private var payloadText: String {
     var lines: [String] = []
-    lines.append("# set_window_frame payload example:")
+    lines.append("# set_window_frames payload example:")
     lines.append("[")
-    for (index, entry) in entries.enumerated() {
-      let comma = index == entries.count - 1 ? "" : ","
+    var seen: Set<String> = []
+    var payloadItems: [String] = []
+    for entry in entries {
+      if entry.bundleID == "com.apple.controlcenter" {
+        continue
+      }
+
       let f = entry.frame
-      let line = String(
+      let item = String(
         format:
-          "  { \"bundle_identifier\": \"%@\", \"x\": %.0f, \"y\": %.0f, \"width\": %.0f, \"height\": %.0f }%@",
-        entry.bundleID, f.origin.x, f.origin.y, f.size.width, f.size.height, comma
+          "  { \"bundle_identifier\": \"%@\", \"x\": %.0f, \"y\": %.0f, \"width\": %.0f, \"height\": %.0f }",
+        entry.bundleID, f.origin.x, f.origin.y, f.size.width, f.size.height
       )
-      lines.append(line)
+      if seen.insert(item).inserted {
+        payloadItems.append(item)
+      }
+    }
+
+    for (index, item) in payloadItems.enumerated() {
+      let comma = index == payloadItems.count - 1 ? "" : ","
+      lines.append("\(item)\(comma)")
     }
     lines.append("]")
     return lines.joined(separator: "\n")

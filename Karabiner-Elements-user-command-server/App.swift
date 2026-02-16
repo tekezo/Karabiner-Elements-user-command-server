@@ -20,15 +20,27 @@ struct UserCommandServerApp: App {
   }
 
   var body: some Scene {
-    MenuBarExtra("UserCommandServer", systemImage: "puzzlepiece.extension") {
-      Text(appDisplayName)
+    MenuBarExtra(
+      content: {
+        Text(appDisplayName)
 
-      Divider()
+        Divider()
 
-      Button("Quit") {
-        NSApp.terminate(nil)
+        Button("Quit") {
+          NSApp.terminate(nil)
+        }
+      },
+      label: {
+        Label(
+          title: { Text(appDisplayName) },
+          icon: {
+            // To prevent the menu icon from appearing blurry, it is necessary to explicitly set the displayScale.
+            Image(systemName: "puzzlepiece.extension")
+              .environment(\.displayScale, 2.0)
+          }
+        )
       }
-    }
+    )
 
     // Define the main window scene, but don't auto-present it at launch
     WindowGroup {
