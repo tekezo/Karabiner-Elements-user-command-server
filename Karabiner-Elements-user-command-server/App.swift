@@ -51,6 +51,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var receiver: KEUserCommandReceiver?
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+    OpenAtLogin.shared.update(register: true)
+
     receiver = KEUserCommandReceiver(
       path: KEUserCommandReceiver.defaultSocketPath(),
       onJSON: { json in
