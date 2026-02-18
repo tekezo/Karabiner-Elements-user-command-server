@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		34CA68432F41FCE700C75CE0 /* KarabinerElementsUserCommandReceiver in Frameworks */ = {isa = PBXBuildFile; productRef = 34CA68422F41FCE700C75CE0 /* KarabinerElementsUserCommandReceiver */; };
+		3415A3A32F45DAC20054BFA8 /* KarabinerElementsUserCommandReceiver in Frameworks */ = {isa = PBXBuildFile; productRef = 3415A3A22F45DAC20054BFA8 /* KarabinerElementsUserCommandReceiver */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34CA68432F41FCE700C75CE0 /* KarabinerElementsUserCommandReceiver in Frameworks */,
+				3415A3A32F45DAC20054BFA8 /* KarabinerElementsUserCommandReceiver in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +70,7 @@
 			);
 			name = "Karabiner-Elements-user-command-server";
 			packageProductDependencies = (
-				34CA68422F41FCE700C75CE0 /* KarabinerElementsUserCommandReceiver */,
+				3415A3A22F45DAC20054BFA8 /* KarabinerElementsUserCommandReceiver */,
 			);
 			productName = "Karabiner-Elements-user-command-server";
 			productReference = 3467C2672F41FB1200441A5D /* Karabiner-Elements-user-command-server.app */;
@@ -101,7 +101,7 @@
 			mainGroup = 3467C25E2F41FB1200441A5D;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				34CA68412F41FCE700C75CE0 /* XCRemoteSwiftPackageReference "Karabiner-Elements-user-command-receiver" */,
+				3415A3A12F45DAC20054BFA8 /* XCRemoteSwiftPackageReference "Karabiner-Elements-user-command-receiver" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3467C2682F41FB1200441A5D /* Products */;
@@ -346,20 +346,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		34CA68412F41FCE700C75CE0 /* XCRemoteSwiftPackageReference "Karabiner-Elements-user-command-receiver" */ = {
+		3415A3A12F45DAC20054BFA8 /* XCRemoteSwiftPackageReference "Karabiner-Elements-user-command-receiver" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pqrs-org/Karabiner-Elements-user-command-receiver";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		34CA68422F41FCE700C75CE0 /* KarabinerElementsUserCommandReceiver */ = {
+		3415A3A22F45DAC20054BFA8 /* KarabinerElementsUserCommandReceiver */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 34CA68412F41FCE700C75CE0 /* XCRemoteSwiftPackageReference "Karabiner-Elements-user-command-receiver" */;
+			package = 3415A3A12F45DAC20054BFA8 /* XCRemoteSwiftPackageReference "Karabiner-Elements-user-command-receiver" */;
 			productName = KarabinerElementsUserCommandReceiver;
 		};
 /* End XCSwiftPackageProductDependency section */
