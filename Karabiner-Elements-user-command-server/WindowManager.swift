@@ -120,9 +120,11 @@ enum WindowManager {
       }
       if currentSize.width <= 0 || currentSize.height <= 0 { continue }
 
-      // Apply size and position
-      _ = setAXSize(window: window, size: size)
+      // Apply position and size.
+      // If the window's original position is near the right edge of screen,
+      // increasing its width during resizing may fail, so the position needs to be changed first.
       _ = setAXPosition(window: window, position: position)
+      _ = setAXSize(window: window, size: size)
     }
   }
 
