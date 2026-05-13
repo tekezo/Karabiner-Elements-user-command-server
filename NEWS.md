@@ -1,5 +1,13 @@
 # Changelog
 
+## Karabiner-Elements-user-command-server v1.3.0
+
+- [📦 Download](https://github.com/tekezo/Karabiner-Elements-user-command-server/releases/download/v1.3.0/Karabiner-Elements-user-command-server-1.3.0.dmg)
+- 📅 Release date
+    - May 13, 2026
+- ⚡️ Improvements
+    - Support "left","right" in `x` and "top","center","bottom" in `y`.
+
 ## Karabiner-Elements-user-command-server v1.2.0
 
 - [📦 Download](https://github.com/tekezo/Karabiner-Elements-user-command-server/releases/download/v1.2.0/Karabiner-Elements-user-command-server-1.2.0.dmg)
