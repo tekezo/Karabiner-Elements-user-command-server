@@ -4,7 +4,7 @@ import Cocoa
 struct WindowFrameSpec: Decodable {
   let bundleIdentifier: String
   let x: XValue
-  let y: CGFloat
+  let y: YValue
   let width: CGFloat
   let height: CGFloat
 
@@ -15,13 +15,26 @@ struct WindowFrameSpec: Decodable {
 
   enum XValue: Decodable {
     case number(CGFloat)
+    case left
     case center
+    case right
 
     init(from decoder: Decoder) throws {
       let container = try decoder.singleValueContainer()
-      if let str = try? container.decode(String.self), str.lowercased() == "center" {
-        self = .center
-        return
+      if let str = try? container.decode(String.self) {
+        switch str.lowercased() {
+        case "left":
+          self = .left
+          return
+        case "center":
+          self = .center
+          return
+        case "right":
+          self = .right
+          return
+        default:
+          break
+        }
       }
       if let num = try? container.decode(CGFloat.self) {
         self = .number(num)
@@ -29,7 +42,44 @@ struct WindowFrameSpec: Decodable {
       }
       throw DecodingError.typeMismatch(
         CGFloat.self,
-        .init(codingPath: decoder.codingPath, debugDescription: "x must be a number or 'center'"))
+        .init(
+          codingPath: decoder.codingPath,
+          debugDescription: "x must be a number, 'left', 'center', or 'right'"))
+    }
+  }
+
+  enum YValue: Decodable {
+    case number(CGFloat)
+    case top
+    case center
+    case bottom
+
+    init(from decoder: Decoder) throws {
+      let container = try decoder.singleValueContainer()
+      if let str = try? container.decode(String.self) {
+        switch str.lowercased() {
+        case "top":
+          self = .top
+          return
+        case "center":
+          self = .center
+          return
+        case "bottom":
+          self = .bottom
+          return
+        default:
+          break
+        }
+      }
+      if let num = try? container.decode(CGFloat.self) {
+        self = .number(num)
+        return
+      }
+      throw DecodingError.typeMismatch(
+        CGFloat.self,
+        .init(
+          codingPath: decoder.codingPath,
+          debugDescription: "y must be a number, 'top', 'center', or 'bottom'"))
     }
   }
 }
@@ -69,16 +119,31 @@ enum WindowManager {
     }
 
     // Compute target origin (shared for all windows)
+    let screen = NSScreen.main
+    let screenFrame = screen?.frame ?? NSScreen.screens.first?.frame ?? .zero
+    let visibleScreenFrame = screen?.visibleFrame ?? NSScreen.screens.first?.visibleFrame ?? .zero
     var originX: CGFloat
     switch spec.x {
     case .number(let x):
       originX = x
+    case .left:
+      originX = visibleScreenFrame.minX
     case .center:
-      let screen = NSScreen.main
-      let screenFrame = screen?.frame ?? NSScreen.screens.first?.frame ?? .zero
       originX = screenFrame.midX - (spec.width / 2.0)
+    case .right:
+      originX = visibleScreenFrame.maxX - spec.width
     }
-    let originY = spec.y
+    var originY: CGFloat
+    switch spec.y {
+    case .number(let y):
+      originY = y
+    case .top:
+      originY = screenFrame.maxY - visibleScreenFrame.maxY
+    case .center:
+      originY = screenFrame.midY - (spec.height / 2.0)
+    case .bottom:
+      originY = screenFrame.maxY - visibleScreenFrame.minY - spec.height
+    }
 
     let size = CGSize(width: spec.width, height: spec.height)
     let position = CGPoint(x: originX, y: originY)

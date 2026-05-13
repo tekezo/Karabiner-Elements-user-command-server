@@ -11,7 +11,10 @@ It supports the following commands:
 ### `set_window_frames`
 
 Applies position and size to windows of the specified app (`bundle_identifier`).
-`x` can be either a number or `"center"`.
+`x` can be either a number, `"left"`, `"center"`, or `"right"`.
+`y` can be either a number, `"top"`, `"center"`, or `"bottom"`.
+`"center"` uses the full screen frame, while edge values use the visible screen frame
+that excludes the menu bar and Dock.
 
 ```json
 {
@@ -26,8 +29,8 @@ Applies position and size to windows of the specified app (`bundle_identifier`).
     },
     {
       "bundle_identifier": "com.apple.Safari",
-      "x": "center",
-      "y": 60,
+      "x": "right",
+      "y": "center",
       "width": 1400,
       "height": 900
     }
