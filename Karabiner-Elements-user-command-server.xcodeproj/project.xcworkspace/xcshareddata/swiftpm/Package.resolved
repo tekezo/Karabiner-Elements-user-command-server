@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pqrs-org/Karabiner-Elements-user-command-receiver",
       "state" : {
-        "revision" : "c5ea194f98a2c06d963a73712fcd676123fd588f",
-        "version" : "1.1.0"
+        "revision" : "8e5cc62ec8b42c749aa8660ca601434c1747b0fd",
+        "version" : "1.2.0"
       }
     }
   ],
