@@ -1,5 +1,13 @@
 # Changelog
 
+## Karabiner-Elements-user-command-server v1.5.0
+
+- [📦 Download](https://github.com/tekezo/Karabiner-Elements-user-command-server/releases/download/v1.5.0/Karabiner-Elements-user-command-server-1.5.0.dmg)
+- 📅 Release date
+    - Jul 10, 2026
+- ✨ New Features
+    - Added the `center_focused_window` command.
+
 ## Karabiner-Elements-user-command-server v1.4.0
 
 - [📦 Download](https://github.com/tekezo/Karabiner-Elements-user-command-server/releases/download/v1.4.0/Karabiner-Elements-user-command-server-1.4.0.dmg)
