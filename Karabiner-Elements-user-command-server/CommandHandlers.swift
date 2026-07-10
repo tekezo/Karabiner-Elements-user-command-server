@@ -10,6 +10,8 @@ struct CommandHandler {
     let command = dict["command"] as? String
     if command == "set_window_frames" {
       handleSetWindowFrames(dict: dict)
+    } else if command == "center_focused_window" {
+      handleCenterFocusedWindow()
     } else if command == "show_window_frames" {
       handleShowWindowFrames()
     }
@@ -27,6 +29,12 @@ struct CommandHandler {
       }
     } catch {
       print("Failed to decode frames:", error)
+    }
+  }
+
+  nonisolated private static func handleCenterFocusedWindow() {
+    Task { @MainActor in
+      WindowManager.centerFocusedWindow()
     }
   }
 

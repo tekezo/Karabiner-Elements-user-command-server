@@ -98,6 +98,40 @@ enum WindowManager {
     }
   }
 
+  @MainActor static func centerFocusedWindow() {
+    _ = ensureAccessibilityPermissions()
+
+    guard let app = NSWorkspace.shared.frontmostApplication else {
+      print("WindowManager: no frontmost application")
+      return
+    }
+
+    let appElem = AXUIElementCreateApplication(app.processIdentifier)
+
+    guard let window = copyFocusedWindow(from: appElem) else {
+      print(
+        "WindowManager: no focused window for:", app.bundleIdentifier ?? app.localizedName ?? "")
+      return
+    }
+
+    guard !isHiddenOrMinimized(window: window), !isDesktopElement(window: window) else {
+      return
+    }
+
+    guard let frame = copyAXFrame(window: window), frame.width > 0, frame.height > 0 else {
+      print("WindowManager: failed to get focused window frame")
+      return
+    }
+
+    let screenFrame = screenFrameContaining(axFrame: frame)
+    let position = CGPoint(
+      x: screenFrame.midX - (frame.width / 2.0),
+      y: screenFrame.midY - (frame.height / 2.0)
+    )
+
+    _ = setAXPosition(window: window, position: position)
+  }
+
   @MainActor private static func setWindow(for spec: WindowFrameSpec) {
     guard
       let app = NSRunningApplication.runningApplications(
@@ -150,39 +184,17 @@ enum WindowManager {
 
     for window in windows {
       // Skip hidden or minimized windows
-      var hiddenRef: CFTypeRef?
-      if AXUIElementCopyAttributeValue(window, kAXHiddenAttribute as CFString, &hiddenRef)
-        == .success,
-        let hidden = hiddenRef as? Bool, hidden
-      {
-        continue
-      }
-      var miniRef: CFTypeRef?
-      if AXUIElementCopyAttributeValue(window, kAXMinimizedAttribute as CFString, &miniRef)
-        == .success,
-        let minimized = miniRef as? Bool, minimized
-      {
+      if isHiddenOrMinimized(window: window) {
         continue
       }
 
       // Skip desktop elements by role
-      var roleRef: CFTypeRef?
-      if AXUIElementCopyAttributeValue(window, kAXRoleAttribute as CFString, &roleRef) == .success,
-        let role = roleRef as? String, role == "AXDesktop"
-      {
+      if isDesktopElement(window: window) {
         continue
       }
 
       // Skip zero-sized windows
-      var sizeRef: CFTypeRef?
-      _ = AXUIElementCopyAttributeValue(window, kAXSizeAttribute as CFString, &sizeRef)
-      var currentSize: CGSize = .zero
-      if let s = sizeRef, CFGetTypeID(s) == AXValueGetTypeID() {
-        let axValue: AXValue = unsafeDowncast(s, to: AXValue.self)
-        if AXValueGetType(axValue) == .cgSize {
-          AXValueGetValue(axValue, .cgSize, &currentSize)
-        }
-      }
+      let currentSize = copyAXSize(window: window) ?? .zero
       if currentSize.width <= 0 || currentSize.height <= 0 { continue }
 
       // Apply position and size.
@@ -191,6 +203,129 @@ enum WindowManager {
       _ = setAXPosition(window: window, position: position)
       _ = setAXSize(window: window, size: size)
     }
+  }
+
+  @MainActor private static func copyFocusedWindow(from app: AXUIElement) -> AXUIElement? {
+    var value: AnyObject?
+    if AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &value)
+      == .success,
+      let window = value
+    {
+      return unsafeDowncast(window, to: AXUIElement.self)
+    }
+
+    value = nil
+    if AXUIElementCopyAttributeValue(app, kAXMainWindowAttribute as CFString, &value) == .success,
+      let window = value
+    {
+      return unsafeDowncast(window, to: AXUIElement.self)
+    }
+
+    return nil
+  }
+
+  @MainActor private static func isHiddenOrMinimized(window: AXUIElement) -> Bool {
+    var hiddenRef: CFTypeRef?
+    if AXUIElementCopyAttributeValue(window, kAXHiddenAttribute as CFString, &hiddenRef)
+      == .success,
+      let hidden = hiddenRef as? Bool, hidden
+    {
+      return true
+    }
+
+    var miniRef: CFTypeRef?
+    if AXUIElementCopyAttributeValue(window, kAXMinimizedAttribute as CFString, &miniRef)
+      == .success,
+      let minimized = miniRef as? Bool, minimized
+    {
+      return true
+    }
+
+    return false
+  }
+
+  @MainActor private static func isDesktopElement(window: AXUIElement) -> Bool {
+    var roleRef: CFTypeRef?
+    if AXUIElementCopyAttributeValue(window, kAXRoleAttribute as CFString, &roleRef) == .success,
+      let role = roleRef as? String, role == "AXDesktop"
+    {
+      return true
+    }
+
+    return false
+  }
+
+  @MainActor private static func copyAXFrame(window: AXUIElement) -> CGRect? {
+    guard let position = copyAXPosition(window: window),
+      let size = copyAXSize(window: window)
+    else {
+      return nil
+    }
+
+    return CGRect(origin: position, size: size)
+  }
+
+  @MainActor private static func copyAXPosition(window: AXUIElement) -> CGPoint? {
+    var value: CFTypeRef?
+    guard
+      AXUIElementCopyAttributeValue(window, kAXPositionAttribute as CFString, &value)
+        == .success,
+      let axValueRef = value,
+      CFGetTypeID(axValueRef) == AXValueGetTypeID()
+    else {
+      return nil
+    }
+
+    let axValue: AXValue = unsafeDowncast(axValueRef, to: AXValue.self)
+    guard AXValueGetType(axValue) == .cgPoint else {
+      return nil
+    }
+
+    var position = CGPoint.zero
+    AXValueGetValue(axValue, .cgPoint, &position)
+    return position
+  }
+
+  @MainActor private static func copyAXSize(window: AXUIElement) -> CGSize? {
+    var value: CFTypeRef?
+    guard AXUIElementCopyAttributeValue(window, kAXSizeAttribute as CFString, &value) == .success,
+      let axValueRef = value,
+      CFGetTypeID(axValueRef) == AXValueGetTypeID()
+    else {
+      return nil
+    }
+
+    let axValue: AXValue = unsafeDowncast(axValueRef, to: AXValue.self)
+    guard AXValueGetType(axValue) == .cgSize else {
+      return nil
+    }
+
+    var size = CGSize.zero
+    AXValueGetValue(axValue, .cgSize, &size)
+    return size
+  }
+
+  @MainActor private static func screenFrameContaining(axFrame: CGRect) -> CGRect {
+    let screens = NSScreen.screens
+    guard let mainScreenFrame = NSScreen.main?.frame ?? screens.first?.frame else {
+      return .zero
+    }
+
+    let axFrames = screens.map { screen in
+      CGRect(
+        x: screen.frame.minX,
+        y: mainScreenFrame.maxY - screen.frame.maxY,
+        width: screen.frame.width,
+        height: screen.frame.height
+      )
+    }
+
+    let windowCenter = CGPoint(x: axFrame.midX, y: axFrame.midY)
+    if let frame = axFrames.first(where: { $0.contains(windowCenter) }) {
+      return frame
+    }
+
+    return axFrames.first ?? .zero
   }
 
   @MainActor @discardableResult

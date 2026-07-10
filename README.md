@@ -4,6 +4,7 @@ This is a macOS menu bar app intended to be used with Karabiner-Elements `send_u
 It supports the following commands:
 
 - `set_window_frames`: Move and resize windows for the specified apps
+- `center_focused_window`: Move the focused window to the center of its screen without resizing it
 - `show_window_frames`: Collect current window information and show a payload example for `set_window_frames`
 
 ## Supported Commands
@@ -35,6 +36,17 @@ that excludes the menu bar and Dock.
       "height": 900
     }
   ]
+}
+```
+
+### `center_focused_window`
+
+Moves the focused window to the center of the screen that contains it.
+The window size is not changed.
+
+```json
+{
+  "command": "center_focused_window"
 }
 ```
 
